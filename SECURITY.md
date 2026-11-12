@@ -1,6 +1,6 @@
 # Segurança — TubExtractor
 
-Nome visível: **TubExtractor**. Repositório e applicationId seguem `subshaul` (`com.fabriciocotrim.subshaul`), para instalar por cima das versões antigas.
+Nome visível e repositório: **TubExtractor**. O applicationId segue `subshaul` (`com.fabriciocotrim.subshaul`), para instalar por cima das versões antigas.
 
 **Classe: R0** — app local, sem backend, sem conta, sem pagamento, sem dado pessoal coletado. [DECISÃO PO, 2026-11-11]
 
