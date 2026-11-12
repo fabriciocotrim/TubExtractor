@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark in both themes: the symbol white tail needs the charcoal base. -->
+    <color name="splash_background">#121418</color>
+</resources>

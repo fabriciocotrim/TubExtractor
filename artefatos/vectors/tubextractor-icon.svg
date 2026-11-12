@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="coralToWhite" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF4444"/>
+      <stop offset="35%" stop-color="#FF7864"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <filter id="subtleShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="24" y="24" width="464" height="464" rx="105" ry="105" fill="#14161B" filter="url(#subtleShadow)"/>
+
+  <!-- Transcription Play Lines -->
+  <g stroke-linecap="round" stroke-width="13">
+    <!-- Line 0 -->
+    <line x1="140" y1="120" x2="175" y2="120" stroke="#FF4444"/>
+    <!-- Line 1 -->
+    <line x1="140" y1="145" x2="210" y2="145" stroke="#FF4F4B"/>
+    <!-- Line 2 (segmented) -->
+    <line x1="140" y1="170" x2="195" y2="170" stroke="#FF5C54"/>
+    <line x1="210" y1="170" x2="248" y2="170" stroke="#FF5C54"/>
+    <!-- Line 3 -->
+    <line x1="140" y1="195" x2="285" y2="195" stroke="#FF6A5E"/>
+    <!-- Line 4 (segmented) -->
+    <line x1="140" y1="220" x2="190" y2="220" stroke="#FF7969"/>
+    <line x1="205" y1="220" x2="320" y2="220" stroke="#FF7969"/>
+    <!-- Line 5 (Apex) -->
+    <line x1="140" y1="245" x2="360" y2="245" stroke="#FF8A7C"/>
+    <!-- Line 6 (Apex lower) -->
+    <line x1="140" y1="270" x2="360" y2="270" stroke="#FF9C90"/>
+    <!-- Line 7 (segmented) -->
+    <line x1="140" y1="295" x2="235" y2="295" stroke="#FFB2A8"/>
+    <line x1="250" y1="295" x2="320" y2="295" stroke="#FFB2A8"/>
+    <!-- Line 8 -->
+    <line x1="140" y1="320" x2="285" y2="320" stroke="#FFCCC6"/>
+    <!-- Line 9 (segmented) -->
+    <line x1="140" y1="345" x2="175" y2="345" stroke="#FFE3E0"/>
+    <line x1="190" y1="345" x2="248" y2="345" stroke="#FFE3E0"/>
+    <!-- Line 10 -->
+    <line x1="140" y1="370" x2="210" y2="370" stroke="#F5F5F7"/>
+    <!-- Line 11 -->
+    <line x1="140" y1="395" x2="175" y2="395" stroke="#FFFFFF"/>
+  </g>
+</svg>

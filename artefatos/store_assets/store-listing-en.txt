@@ -1,0 +1,47 @@
+=====================================================
+TUBEXTRACTOR - APP STORE & PLAY STORE LISTING (GLOBAL)
+=====================================================
+
+APP TITLE (max 30 chars):
+TubExtractor: Bulk Transcripts
+
+SUBTITLE / SHORT DESCRIPTION (max 80 chars):
+Extract YouTube transcripts in bulk. 100% on-device, fast & private.
+
+CATEGORY:
+Productivity / Tools
+
+PROMOTIONAL TEXT (iOS - 170 chars):
+Batch download video transcripts, playlists, or entire channels in seconds. Export to TXT, SRT, VTT, Markdown & JSON without accounts or servers.
+
+FULL DESCRIPTION:
+TubExtractor is the ultimate productivity tool for researchers, students, content creators, and professionals who need video text without the hassle. Extract transcripts from single videos, full playlists, or entire channels in bulk — directly on your device.
+
+KEY FEATURES:
+
+◆ Powerful Bulk Extraction
+Paste a single video, playlist, full channel, or multiple links at once. You can also tap "Share" directly from the YouTube app. TubExtractor queues and processes up to 500 videos at a time, ordering from newest to oldest.
+
+◆ Multiple Export Formats
+Get your transcriptions in the exact format you need:
+- Plain Text (.TXT)
+- Subtitles (.SRT, .VTT)
+- Formatted Markdown (.MD)
+- Structured Data (.JSON)
+Export with or without precise timestamps. Download individual files or grab a complete ZIP archive with an automated spreadsheet index.
+
+◆ 100+ Languages & Auto-Fallback
+Access transcripts in over 100 languages. If your desired target language is unavailable, TubExtractor leverages YouTube's auto-translation engine, falling back seamlessly to the original audio track if needed.
+
+◆ 100% Private & On-Device
+No accounts to register. No subscription walls. No remote servers processing your activity. Every query, transcript, and export lives entirely on your device.
+
+◆ Smart Resume & Zero Duplication
+Never lose progress. Each video displays real-time processing status with clear error reporting if a transcript is unavailable. TubExtractor remembers what you've already fetched and will not re-download existing files. Close the app anytime — it resumes right where you left off.
+
+◆ Built-in Search & Quick Copy
+Search keywords across transcriptions instantly, copy full text with a single tap, or share files directly to your favorite notes app, Google Drive, or Notion.
+
+-----------------------------------------------------
+KEYWORDS (iOS ASO - comma-separated, max 100 chars):
+youtube transcript,subtitles,bulk downloader,video to text,transcribe,srt,vtt,markdown,study tools
