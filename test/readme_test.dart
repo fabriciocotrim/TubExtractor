@@ -21,8 +21,18 @@ List<String> _localTargets(String md) {
       .toList();
 }
 
-List<String> _sections(String md) =>
-    md.split('\n').where((l) => l.startsWith('## ')).toList();
+/// 8 screenshots (4 screens × light/dark) + the demo animation.
+const _minMediaItems = 9;
+
+String _read(String page) => File(page).readAsStringSync();
+
+/// Heading levels in order (e.g. [2, 2, 3, 3, 2]); titles differ by language,
+/// the structure must not.
+List<int> _outline(String md) => md
+    .split('\n')
+    .where((l) => RegExp(r'^#{2,3} ').hasMatch(l))
+    .map((l) => l.indexOf(' '))
+    .toList();
 
 void main() {
   for (final page in _pages) {
@@ -31,7 +41,7 @@ void main() {
     });
 
     test('every local link and image in $page points to an existing file', () {
-      final md = File(page).readAsStringSync();
+      final md = _read(page);
       final targets = _localTargets(md);
       expect(targets, isNotEmpty);
       final missing = targets.where((t) => !File(t).existsSync() && !Directory(t).existsSync());
@@ -39,27 +49,27 @@ void main() {
     });
 
     test('$page shows the app screens and the demo', () {
-      final targets = _localTargets(File(page).readAsStringSync());
-      expect(targets.where((t) => t.startsWith('docs/media/')).length, greaterThanOrEqualTo(9));
+      final targets = _localTargets(_read(page));
+      expect(targets.where((t) => t.startsWith('docs/media/')).length, greaterThanOrEqualTo(_minMediaItems));
       expect(targets, contains('docs/media/demo.gif'));
     });
   }
 
   test('English and Portuguese pages link to each other', () {
-    expect(_localTargets(File('README.md').readAsStringSync()), contains('README.pt-BR.md'));
-    expect(_localTargets(File('README.pt-BR.md').readAsStringSync()), contains('README.md'));
+    expect(_localTargets(_read('README.md')), contains('README.pt-BR.md'));
+    expect(_localTargets(_read('README.pt-BR.md')), contains('README.md'));
   });
 
-  test('both pages have the same number of sections', () {
-    final en = _sections(File('README.md').readAsStringSync());
-    final pt = _sections(File('README.pt-BR.md').readAsStringSync());
+  test('both pages have the same section structure', () {
+    final en = _outline(_read('README.md'));
+    final pt = _outline(_read('README.pt-BR.md'));
     expect(en, isNotEmpty);
-    expect(pt.length, en.length, reason: 'EN: $en\nPT: $pt');
+    expect(pt, en, reason: 'heading levels differ between EN and PT');
   });
 
   test('both pages carry the contact, license and non-affiliation notice', () {
     for (final page in _pages) {
-      final md = File(page).readAsStringSync();
+      final md = _read(page);
       expect(md, contains('linkedin.com/in/fabr%C3%ADcio-cotrim-b565a073'), reason: page);
       expect(md, contains('Apache-2.0'), reason: page);
       expect(md, contains('YouTube'), reason: page);

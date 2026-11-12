@@ -80,7 +80,7 @@ Flutter 3.47 / Dart, Android only. All knowledge about YouTube lives in one modu
 ### Security
 
 - Threat model per asset in [SECURITY.md](SECURITY.md): malicious shared text, path traversal in ZIP names, formula injection in the CSV, caption URLs pointing outside YouTube, rate limiting.
-- Security gate before every release: secret scan of the code and of the whole Git history (gitleaks), static analysis with OWASP Top 10 rules (semgrep), dependency vulnerabilities (osv-scanner).
+- Security gate before every release: secret scan of the code and of the whole Git history (gitleaks), static analysis with 79 OWASP Top 10 and secret rules (semgrep), dependency vulnerabilities (osv-scanner).
 - The signing key never enters the repository. A release build fails without it.
 
 ### Process

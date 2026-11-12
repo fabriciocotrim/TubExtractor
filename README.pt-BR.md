@@ -78,7 +78,7 @@ Flutter 3.47 / Dart, só Android. Todo o conhecimento sobre o YouTube fica num �
 ### Segurança
 
 - Modelo de ameaças por bem no [SECURITY.md](SECURITY.md): texto compartilhado malicioso, caminho falso no nome dos arquivos do ZIP, fórmula injetada no CSV, legenda apontando para fora do YouTube, limite de pedidos.
-- Portão de segurança antes de cada versão: busca de segredos no código e em todo o histórico do Git (gitleaks), análise estática com regras OWASP Top 10 (semgrep), vulnerabilidades em dependências (osv-scanner).
+- Portão de segurança antes de cada versão: busca de segredos no código e em todo o histórico do Git (gitleaks), análise estática com 79 regras OWASP Top 10 e de segredos (semgrep), vulnerabilidades em dependências (osv-scanner).
 - A chave de assinatura nunca entra no repositório. O build de release falha sem ela.
 
 ### Processo

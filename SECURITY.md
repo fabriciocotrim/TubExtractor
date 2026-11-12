@@ -39,3 +39,14 @@ Nada sai do aparelho além dos pedidos ao YouTube. Sem analytics, sem log em rel
 | `flutter test` | 159 testes passando, 5 rodadas seguidas |
 | `flutter analyze` | sem avisos |
 | `gitleaks git` (histórico) | sem vazamentos (commit inicial `302664f`, antes e depois do push) |
+
+## Portão (fase 7) — 2026-11-12, repositório público TubExtractor
+| Ferramenta | Resultado |
+|---|---|
+| E-mail no histórico do repositório novo (autor, committer, corpo, tags) | só `…@users.noreply.github.com` e `noreply@anthropic.com` |
+| `gitleaks git` (histórico novo) | sem vazamentos |
+| `gitleaks dir` em `lib`, `test`, `assets`, `android/app/src`, `docs`, `artefatos`, `.github`, READMEs, NOTICE, LICENSE | sem vazamentos |
+| `semgrep p/owasp-top-ten p/secrets` | 0 achados, 79 regras, 63 arquivos |
+| `osv-scanner` | sem vulnerabilidades |
+| `flutter test` | 168 testes passando (inclui `test/readme_test.dart`: links e imagens das páginas) |
+| CI (`.github/workflows/tests.yml`) | `flutter analyze` + `flutter test` a cada envio; `contents: read`; Actions fixadas por SHA; sem segredos |
