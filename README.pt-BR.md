@@ -71,7 +71,7 @@ Flutter 3.47 / Dart, só Android. Todo o conhecimento sobre o YouTube fica num �
 
 ### Qualidade
 
-- **168 testes automáticos** (unidade e widget), rodados a cada envio pelo GitHub Actions. Análise estática sem nenhum aviso.
+- **168 testes automáticos** (unidade e widget), rodados pelo GitHub Actions a cada mudança na `main` e em todo pull request. Análise estática sem nenhum aviso.
 - Os testes cobrem os caminhos reais que quebraram no desenvolvimento, por exemplo o desfazer de uma busca apagada, com sequências aleatórias de ações.
 - Cada versão também é testada à mão no emulador e num celular real.
 

@@ -13,7 +13,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **Primary Accent** | `--color-accent-coral` | `#FF4444` | `rgb(255, 68, 68)` | Acentos, botão de ação principal, início do gradiente |
 | **Secondary Accent** | `--color-accent-peach` | `#FF7864` | `rgb(255, 120, 100)` | Estados de hover, transição do logo, badges |
-| **Selection (dark)** | `--color-accent-teal` | `#5EE6C8` | `rgb(94, 230, 200)` | Modo escuro: seleção, foco, progresso, botões simples (D-01 C). Coral fica só em Buscar, Baixar ZIP e "Extractor" |
+| **Selection (dark)** | `--color-accent-teal` | `#5EE6C8` | `rgb(94, 230, 200)` | Modo escuro: seleção, foco, progresso, botões simples. Coral fica só em Buscar, Baixar ZIP e "Extractor" |
 | **Background Dark** | `--color-bg-base` | `#121418` | `rgb(18, 20, 24)` | Fundo da aplicação / tema escuro nativo |
 | **Surface Dark** | `--color-surface-card` | `#1C1F26` | `rgb(28, 31, 38)` | Cards de vídeos, painéis de exportação |
 | **Surface Border** | `--color-border-subtle` | `#2D333F` | `rgb(45, 51, 63)` | Divisores, bordas de inputs e caixas de seleção |
