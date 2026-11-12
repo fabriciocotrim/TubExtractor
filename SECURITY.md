@@ -38,7 +38,7 @@ Nada sai do aparelho além dos pedidos ao YouTube. Sem analytics, sem log em rel
 | `osv-scanner` (`pubspec.lock`) | sem vulnerabilidades |
 | `flutter test` | 159 testes passando, 5 rodadas seguidas |
 | `flutter analyze` | sem avisos |
-| `gitleaks git` (histórico) | sem vazamentos (commit inicial `302664f`, antes e depois do push) |
+| `gitleaks git` (histórico) | sem vazamentos (commit inicial `302664f` no repositório anterior, hoje `2f12506` no TubExtractor) |
 
 ## Portão (fase 7) — 2026-11-12, repositório público TubExtractor
 | Ferramenta | Resultado |
