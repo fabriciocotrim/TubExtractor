@@ -1,0 +1,17 @@
+TubExtractor
+Copyright 2026 Fabricio Cotrim
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Trademarks: the name "TubExtractor" and its logo, symbol and icons (in the
+artefatos/ folder and in the Android launcher resources) are not licensed
+under the Apache License. Section 6 of the License grants no permission to
+use them. Forks must use a different name and icon.
+
+Third-party fonts bundled in assets/fonts/ are licensed under the SIL Open
+Font License 1.1:
+- Inter (see assets/fonts/OFL-Inter.txt)
+- JetBrains Mono (see assets/fonts/OFL-JetBrainsMono.txt)
+
+TubExtractor is not affiliated with, endorsed by, or sponsored by YouTube or
+Google. YouTube is a trademark of Google LLC.

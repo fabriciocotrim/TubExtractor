@@ -1,22 +1,30 @@
-# TubExtractor — Privacy Policy (100% On-Device)
+# TubExtractor — Privacy Policy
 
-*Last updated: November 2026*
+*Last updated: November 12, 2026* · [Português](PRIVACY_POLICY.pt-BR.md)
 
-TubExtractor is committed to absolute user privacy. This policy outlines how data is handled.
+TubExtractor is an Android app that downloads YouTube transcripts. It has no account, no server and no analytics.
 
-### 1. No Data Collection
-TubExtractor does NOT collect, store, transmit, or monetize any personal information, usage analytics, or device identifiers.
+## 1. What the app sends over the internet
+The app talks only to YouTube (`*.youtube.com`). It sends the requests needed to read the public video, playlist or channel you entered and its caption tracks. YouTube receives these requests as it receives any app request: with your IP address and the data your device sends. YouTube's own privacy policy applies to that.
 
-### 2. 100% Local Processing (On-Device)
-All operations — including fetching video metadata, extracting subtitle tracks, parsing timestamps, and generating export files (.txt, .srt, .vtt, .md, .json, .zip) — occur locally on your smartphone.
+The author of TubExtractor runs no server. No data reaches the author.
 
-### 3. No Accounts or Tracking
-- No user accounts or logins are required.
-- No third-party ad networks or tracking SDKs are integrated into TubExtractor.
-- No user data is ever sent to private third-party servers.
+## 2. What the app does not collect
+- No account or login.
+- No analytics, crash reporting, advertising or tracking SDKs.
+- No device identifiers, contacts, location, camera or microphone.
+- No logs in release builds.
 
-### 4. Third-Party Requests
-When you paste YouTube links or share content to the application, TubExtractor connects directly from your device to public YouTube endpoints solely to retrieve public caption tracks requested by you.
+## 3. What stays on your device
+Your searches, downloaded transcripts, history and preferences (theme, language, format, timestamps, limit) stay in the app's private storage. Only you and the app can read them.
 
-### 5. Data Storage
-All downloaded transcripts and historical logs remain stored in your local application sandbox. You may purge history or delete exported files at any time through the app settings.
+## 4. Sharing and exporting
+The app shares or saves a file only when you tap Share, Save or Download ZIP. You choose the destination app or folder. From that moment, the destination's own policy applies.
+
+When you open a video at a timestamp, the app hands the link to the YouTube app or your browser.
+
+## 5. Deleting your data
+Delete a search in the app to remove its transcripts. Uninstall the app, or clear its storage in Android settings, to remove everything.
+
+## 6. Contact
+Open an issue at https://github.com/fabriciocotrim/TubExtractor/issues.

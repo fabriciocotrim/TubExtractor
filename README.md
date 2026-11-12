@@ -1,7 +1,7 @@
 # TubExtractor
 
 Nome no aparelho: TubExtractor. Repositório e pacote Android: Subshaul (`com.fabriciocotrim.subshaul`), mantidos para a atualização instalar por cima.
-Marca, ícones e fichas de loja: `artefatos/` (ver `artefatos/docs/BRAND_GUIDELINES.md`).
+Marca e ícones: `artefatos/` (ver `artefatos/docs/BRAND_GUIDELINES.md`).
 
 App Android que baixa transcrições do YouTube em lote. Sem conta, sem servidor e sem custo.
 
