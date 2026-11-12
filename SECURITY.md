@@ -38,4 +38,4 @@ Nada sai do aparelho além dos pedidos ao YouTube. Sem analytics, sem log em rel
 | `osv-scanner` (`pubspec.lock`) | sem vulnerabilidades |
 | `flutter test` | 159 testes passando, 5 rodadas seguidas |
 | `flutter analyze` | sem avisos |
-| `gitleaks git` (histórico) | **não rodado**: repositório git ainda não iniciado nesta máquina |
+| `gitleaks git` (histórico) | sem vazamentos (commit inicial `302664f`, antes e depois do push) |
