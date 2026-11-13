@@ -73,7 +73,7 @@ Flutter 3.47 / Dart, Android only. All knowledge about YouTube lives in one modu
 
 ### Quality
 
-- **168 automated tests** (unit and widget), run by GitHub Actions on every change to `main` and on every pull request. Static analysis with zero warnings.
+- **170 automated tests** (unit and widget), run by GitHub Actions on every change to `main` and on every pull request. Static analysis with zero warnings.
 - Tests cover the real paths that broke in development, for example the undo of a deleted search, with random sequences of actions.
 - Every release is also tested by hand on an emulator and on a real phone.
 

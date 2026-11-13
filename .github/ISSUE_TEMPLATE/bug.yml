@@ -1,5 +1,5 @@
-name: Bug report
-description: Something in TubExtractor does not work as expected.
+name: Bug report · Relato de erro
+description: Something in TubExtractor does not work as expected. · Algo no TubExtractor não funciona como esperado.
 labels: [bug]
 body:
   - type: markdown
@@ -7,37 +7,42 @@ body:
       value: |
         Thanks for reporting. This is a personal project: there is no response deadline.
         Do not paste personal data. Public YouTube links only.
+
+        Obrigado pelo relato. É um projeto pessoal: não há prazo de resposta.
+        Não cole dados pessoais. Só links públicos do YouTube.
+
+        Security problem? Do not open an issue: see SECURITY.md. · Problema de segurança? Não abra issue: veja o SECURITY.md.
   - type: input
     id: app_version
     attributes:
-      label: App version
-      description: Shown in Android settings → Apps → TubExtractor.
+      label: App version · Versão do app
+      description: Android settings → Apps → TubExtractor. · Configurações do Android → Apps → TubExtractor.
       placeholder: "1.4.1"
     validations:
       required: true
   - type: input
     id: android_version
     attributes:
-      label: Android version and device
+      label: Android version and device · Versão do Android e aparelho
       placeholder: "Android 15, Pixel 8"
     validations:
       required: true
   - type: input
     id: link
     attributes:
-      label: Example YouTube link
-      description: A public video, playlist or channel where the problem happens.
+      label: Example YouTube link · Link de exemplo do YouTube
+      description: A public video, playlist or channel where the problem happens. · Um vídeo, playlist ou canal público onde o erro acontece.
     validations:
       required: false
   - type: textarea
     id: what_happened
     attributes:
-      label: What happened
+      label: What happened · O que aconteceu
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: What you expected
+      label: What you expected · O que você esperava
     validations:
       required: true

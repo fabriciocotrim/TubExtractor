@@ -1,4 +1,29 @@
-# Segurança — TubExtractor
+# Security · Segurança — TubExtractor
+
+## Reporting a vulnerability
+
+Do not open a public issue. Use **Security → Report a vulnerability** on this repository (GitHub private vulnerability reporting). Only the maintainer sees the report. This is a personal project: there is no response deadline, but security reports come first.
+
+Supported version: the latest release only.
+
+## Summary (English)
+
+- **Risk class R0:** the app runs only on the phone. There is no backend, no account, no payment and no personal data collected.
+- **Network:** the app talks only to `https://*.youtube.com`. Caption URLs that point elsewhere are refused.
+- **Input:** shared or pasted text is limited to 20,000 characters and parsed against YouTube hosts and 11-character video ids only.
+- **Export:** file names in the ZIP cannot contain path separators; CSV cells that start with a formula character are escaped.
+- **Rate limiting:** 2 parallel requests, pauses and retries; a job pauses after repeated blocks by YouTube; 500 videos per job at most.
+- **Release signing:** the signing key stays outside the repository; a release build fails without it.
+- **Accepted risks:** YouTube's Terms restrict automated access; the app code can be copied (it holds no secret).
+- **Gate before every release:** gitleaks (code and full Git history), semgrep (OWASP Top 10 and secrets), osv-scanner, all tests. Results are recorded below, in Portuguese.
+
+## Como relatar uma vulnerabilidade
+
+Não abra issue pública. Use **Security → Report a vulnerability** neste repositório (relato privado do GitHub). Só o mantenedor vê o relato. É um projeto pessoal: não há prazo de resposta, mas relato de segurança vem primeiro.
+
+Versão com suporte: só a última.
+
+## Detalhes (português)
 
 Nome visível e repositório: **TubExtractor**. O applicationId segue `subshaul` (`com.fabriciocotrim.subshaul`), para instalar por cima das versões antigas.
 

@@ -77,4 +77,23 @@ void main() {
       expect(md, isNot(contains('gmail.com')), reason: page);
     }
   });
+
+  // D-26: the rest of the public repository speaks both languages too.
+  test('security policy tells, in English and Portuguese, how to report privately', () {
+    final md = _read('SECURITY.md');
+    expect(md, contains('## Reporting a vulnerability'));
+    expect(md, contains('## Como relatar uma vulnerabilidade'));
+    expect('Report a vulnerability'.allMatches(md).length, greaterThanOrEqualTo(2));
+    expect(md, isNot(contains('gmail.com')));
+  });
+
+  test('bug report form asks every question in English and Portuguese', () {
+    final form = _read('.github/ISSUE_TEMPLATE/bug.yml');
+    final labels = RegExp(r'^\s+label: (.+)$', multiLine: true).allMatches(form).map((m) => m.group(1)!).toList();
+    expect(labels, hasLength(5));
+    for (final label in labels) {
+      expect(label, contains(' · '), reason: 'label "$label" is not bilingual');
+    }
+    expect(form, contains('SECURITY.md'));
+  });
 }
