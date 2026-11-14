@@ -48,12 +48,34 @@ void main() {
       expect(missing, isEmpty, reason: 'broken targets in $page');
     });
 
-    test('$page shows the app screens and the demo', () {
-      final targets = _localTargets(_read(page));
-      expect(targets.where((t) => t.startsWith('docs/media/')).length, greaterThanOrEqualTo(_minMediaItems));
-      expect(targets, contains('docs/media/demo.gif'));
+    // D-32 A: each page shows the app in its own language.
+    test('$page shows the app screens and the demo in its language', () {
+      final dir = page == 'README.md' ? 'docs/media/en/' : 'docs/media/';
+      final media = _localTargets(_read(page)).where((t) => t.startsWith('docs/media/')).toList();
+      expect(media.length, greaterThanOrEqualTo(_minMediaItems));
+      expect(media, contains('${dir}demo.gif'));
+      for (final t in media) {
+        final inDir = t.startsWith(dir) && !t.substring(dir.length).contains('/');
+        expect(inDir, isTrue, reason: '$page shows $t, an image of the other language');
+      }
     });
   }
+
+  test('the English images are the same screens as the Portuguese ones', () {
+    const shots = ['home', 'job', 'reader', 'export'];
+    for (final s in shots) {
+      for (final theme in ['light', 'dark']) {
+        expect(File('docs/media/en/$s-$theme.png').existsSync(), isTrue, reason: 'en/$s-$theme.png');
+        expect(File('docs/media/$s-$theme.png').existsSync(), isTrue, reason: '$s-$theme.png');
+      }
+    }
+  });
+
+  test('both pages say the app speaks English and Portuguese', () {
+    expect(_read('README.md'), contains('The interface is in English and Portuguese'));
+    expect(_read('README.pt-BR.md'), contains('A interface está em inglês e português'));
+    expect(_read('README.md'), isNot(contains('interface is in Brazilian Portuguese')));
+  });
 
   test('English and Portuguese pages link to each other', () {
     expect(_localTargets(_read('README.md')), contains('README.pt-BR.md'));

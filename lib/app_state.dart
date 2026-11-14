@@ -10,7 +10,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/job.dart';
+import 'core/formatters.dart';
 import 'core/job_runner.dart';
+import 'core/languages.dart';
 import 'core/models.dart';
 import 'core/youtube_client.dart';
 import 'core/zip_builder.dart';
@@ -96,7 +98,8 @@ class AppState extends ChangeNotifier {
   /// fake [source] and a temporary [store].
   @visibleForTesting
   static Future<AppState> start(Store store, TranscriptSource source, SharedPreferences prefs,
-      {Duration gap = const Duration(milliseconds: 400),
+      {String? deviceLanguage,
+      Duration gap = const Duration(milliseconds: 400),
       Duration Function()? elapsed,
       Timer Function(Duration, void Function()) timer = Timer.new,
       Duration undoWindow = const Duration(seconds: 5)}) async {
@@ -104,13 +107,13 @@ class AppState extends ChangeNotifier {
       final watch = Stopwatch()..start();
       elapsed = () => watch.elapsed;
     }
+    final jobs = await store.loadJobs();
     final settings = JobSettings(
-      language: prefs.getString('language') ?? 'en',
+      language: await _captionLanguage(prefs, jobs, deviceLanguage ?? PlatformDispatcher.instance.locale.toLanguageTag()),
       format: OutputFormat.values.asNameMap()[prefs.getString('format')] ?? OutputFormat.txt,
       timestamps: TimestampMode.values.asNameMap()[prefs.getString('timestamps')] ?? TimestampMode.off,
       limit: prefs.getInt('limit') ?? maxVideosPerJob,
     );
-    final jobs = await store.loadJobs();
     // The app closed while a delete could still be undone: finish it (D-06 A).
     final doomed = prefs.getStringList(_pendingKey) ?? const <String>[];
     // A failed delete never keeps the app from opening. The job stays marked
@@ -143,6 +146,24 @@ class AppState extends ChangeNotifier {
     app._purgeFailed.addAll(failed);
     app._resumeInterrupted(undone);
     return app;
+  }
+
+  /// Preference keys of version 1.4.1 and later: any of them means the app
+  /// was used before.
+  static const _usedKeys = ['language', 'format', 'timestamps', 'limit', 'theme', _pendingKey, _resumeKey];
+
+  /// Caption language (D-29 A). A saved choice never changes. Someone who
+  /// installs the app gets the phone's language when it is on the list, else
+  /// English; someone who already used 1.4.1 without choosing keeps English,
+  /// the default of that version. The answer is saved, so it stays put even
+  /// if the phone's language changes later.
+  static Future<String> _captionLanguage(SharedPreferences prefs, List<Job> jobs, String deviceTag) async {
+    final saved = prefs.getString('language');
+    if (saved != null) return saved;
+    final usedBefore = jobs.isNotEmpty || _usedKeys.any(prefs.containsKey);
+    final lang = usedBefore ? 'en' : defaultCaptionLanguage(deviceTag);
+    await prefs.setString('language', lang);
+    return lang;
   }
 
   /// Jobs cut off by the app closing continue on their own (spec story 8),
@@ -444,7 +465,10 @@ class AppState extends ChangeNotifier {
     return out;
   }
 
-  Future<Uint8List> buildJobZip(Job job, OutputFormat format, TimestampMode ts) async {
+  /// [labels] and [noteText] write the files in the app's language;
+  /// [notProcessed] is the note of a video still in the queue.
+  Future<Uint8List> buildJobZip(Job job, OutputFormat format, TimestampMode ts,
+      {required ExportLabels labels, required String Function(Notice) noteText, required String notProcessed}) async {
     final entries = <ExportEntry>[];
     for (final i in job.items) {
       final t = i.status == ItemStatus.ok ? await transcriptOf(job, i) : null;
@@ -455,10 +479,10 @@ class AppState extends ChangeNotifier {
         reason: i.status == ItemStatus.ok
             ? (t == null ? FailureReason.unknown : null)
             : (i.reason ?? (i.status == ItemStatus.pending ? null : FailureReason.unknown)),
-        note: i.status == ItemStatus.pending ? 'ainda não processado' : i.note,
+        note: i.status == ItemStatus.pending ? notProcessed : (i.note == null ? null : noteText(i.note!)),
       ));
     }
-    return compute(_zipIsolate, (entries, format, ts));
+    return compute(_zipIsolate, (entries, format, ts, labels));
   }
 
   Future<String> cacheSize() async {
@@ -477,4 +501,5 @@ class AppState extends ChangeNotifier {
   }
 }
 
-Uint8List _zipIsolate((List<ExportEntry>, OutputFormat, TimestampMode) a) => buildZip(a.$1, a.$2, a.$3).bytes;
+Uint8List _zipIsolate((List<ExportEntry>, OutputFormat, TimestampMode, ExportLabels) a) =>
+    buildZip(a.$1, a.$2, a.$3, a.$4).bytes;

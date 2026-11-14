@@ -1,10 +1,12 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:subshaul/core/formatters.dart';
 import 'package:subshaul/core/models.dart';
 import 'package:subshaul/core/zip_builder.dart';
+
+import 'l10n_helper.dart';
 
 Transcript tr({String title = 'Meu vídeo', String id = 'dQw4w9WgXcQ'}) => Transcript(
       videoId: id,
@@ -28,13 +30,13 @@ void main() {
   });
 
   test('TXT off/on/both', () {
-    final off = toTxt(tr(), TimestampMode.off);
+    final off = toTxt(tr(), TimestampMode.off, pt.exportLabels);
     expect(off, contains('Hello there second --> line'));
     expect(off, isNot(contains('[00:01]')));
-    final on = toTxt(tr(), TimestampMode.on);
+    final on = toTxt(tr(), TimestampMode.on, pt.exportLabels);
     expect(on, contains('[00:01] Hello there'));
     expect(on, contains('[1:01:01] late'));
-    final both = toTxt(tr(), TimestampMode.both);
+    final both = toTxt(tr(), TimestampMode.both, pt.exportLabels);
     expect(both, contains('[00:01] Hello there'));
     expect(both, contains('Hello there second'));
   });
@@ -52,7 +54,7 @@ void main() {
   });
 
   test('Markdown com links de tempo', () {
-    final m = toMarkdown(tr(title: 'A *b*'), TimestampMode.on);
+    final m = toMarkdown(tr(title: 'A *b*'), TimestampMode.on, pt.exportLabels);
     expect(m, startsWith('# A \\*b\\*'));
     expect(m, contains('[00:01](https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1s) Hello there'));
   });
@@ -65,7 +67,7 @@ void main() {
 
   group('Proteção: nomes de arquivo', () {
     test('título "../../x" fica dentro de transcripts/', () {
-      final z = buildZip([ExportEntry(videoId: 'dQw4w9WgXcQ', transcript: tr(title: '../../x'))], OutputFormat.txt, TimestampMode.off);
+      final z = buildZip([ExportEntry(videoId: 'dQw4w9WgXcQ', transcript: tr(title: '../../x'))], OutputFormat.txt, TimestampMode.off, pt.exportLabels);
       final a = ZipDecoder().decodeBytes(z.bytes);
       final names = a.files.map((f) => f.name).toList();
       final t = names.firstWhere((n) => n.startsWith('transcripts/'));
@@ -81,7 +83,7 @@ void main() {
       final z = buildZip([
         ExportEntry(videoId: 'aaaaaaaaaaa', transcript: tr(id: 'aaaaaaaaaaa', title: 'Same')),
         ExportEntry(videoId: 'aaaaaaaaaaa', transcript: tr(id: 'aaaaaaaaaaa', title: 'Same')),
-      ], OutputFormat.md, TimestampMode.off);
+      ], OutputFormat.md, TimestampMode.off, pt.exportLabels);
       final names = ZipDecoder().decodeBytes(z.bytes).files.map((f) => f.name).where((n) => n.startsWith('transcripts/')).toSet();
       expect(names.length, 2);
     });
@@ -91,7 +93,7 @@ void main() {
     final z = buildZip([
       ExportEntry(videoId: 'dQw4w9WgXcQ', transcript: tr()),
       const ExportEntry(videoId: 'zzzzzzzzzzz', title: '=HYPERLINK("x")', reason: FailureReason.membersOnly),
-    ], OutputFormat.srt, TimestampMode.on);
+    ], OutputFormat.srt, TimestampMode.on, pt.exportLabels);
     final a = ZipDecoder().decodeBytes(z.bytes);
     final csv = utf8.decode(a.findFile('manifest.csv')!.content as List<int>);
     expect(csv, contains('"membersOnly"'));
@@ -106,7 +108,7 @@ void main() {
     final long = 'A' * 120;
     final z = buildZip([
       for (var i = 0; i < 3; i++) ExportEntry(videoId: 'aaaaaaaaaaa', transcript: tr(id: 'aaaaaaaaaaa', title: long)),
-    ], OutputFormat.txt, TimestampMode.off);
+    ], OutputFormat.txt, TimestampMode.off, pt.exportLabels);
     final names = ZipDecoder().decodeBytes(z.bytes).files.map((f) => f.name).where((n) => n.startsWith('transcripts/')).toSet();
     expect(names.length, 3);
   }, timeout: const Timeout(Duration(seconds: 5)));

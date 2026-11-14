@@ -1,10 +1,12 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:subshaul/core/models.dart';
 import 'package:subshaul/core/youtube_client.dart';
+
+import 'l10n_helper.dart';
 
 Map<String, dynamic> player({String status = 'OK', List<Map<String, dynamic>>? tracks, String? reason}) => {
       'playabilityStatus': {'status': status, 'reason': ?reason},
@@ -94,7 +96,9 @@ void main() {
     final o = await c.fetchTranscript('dQw4w9WgXcQ', 'pt');
     expect(o.transcript.languageCode, 'en');
     expect(o.transcript.isTranslated, isFalse);
-    expect(o.note, contains('Tradução'));
+    expect(o.note, const Notice(NoticeCode.translationUnavailable, ['pt']));
+    expect(pt.notice(o.note!), 'Tradução para Português indisponível. Veio a legenda original');
+    expect(en.notice(o.note!), 'Translation to Portuguese unavailable. Using the original captions');
   });
 
   test('Proteção: playlist com mais de 500 vídeos para em 500', () async {
@@ -160,7 +164,8 @@ void main() {
     final good = await c.fetchTranscript('dQw4w9WgXcQ', 'pt');
     expect(good.cacheable, isTrue);
     expect(good.transcript.isTranslated, isTrue);
-    expect(good.transcript.languageName, 'Português');
+    // Data in the exported JSON: English, like the track names YouTube sends.
+    expect(good.transcript.languageName, 'Portuguese');
   });
 
   test('Juiz: "message" não vira restrição por idade', () {

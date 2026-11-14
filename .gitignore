@@ -56,3 +56,6 @@ RESEARCH.md
 artefatos/*.zip
 .revisao-gemini.txt
 .claude/settings.local.json
+
+# Generated from lib/l10n/*.arb by flutter gen-l10n (pub get / build).
+lib/l10n/app_localizations*.dart

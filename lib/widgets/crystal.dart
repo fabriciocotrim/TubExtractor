@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/l10n.dart';
 import 'motion.dart';
 
 @immutable
@@ -515,7 +516,7 @@ class _CrystalProgressState extends State<CrystalProgress>
     final scheme = Theme.of(context).colorScheme;
     final c = Crystal.of(context);
     return Semantics(
-      label: 'Progresso',
+      label: l10nOf(context).progress,
       value: widget.value == null ? null : '${(widget.value! * 100).round()}%',
       child: SizedBox(
         height: 8,

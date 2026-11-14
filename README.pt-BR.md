@@ -35,6 +35,8 @@ Cole um link do YouTube ou toque em **Compartilhar** no app do YouTube. O TubExt
 - **Retoma:** uma busca interrompida continua quando o app abre de novo. Busca apagada pode ser desfeita por 5 segundos.
 - **Privado:** sem conta, sem analytics. O app fala só com o YouTube. Veja a [política de privacidade](artefatos/docs/PRIVACY_POLICY.pt-BR.md).
 
+A interface está em inglês e português e segue a língua do celular (no Android 13 ou mais novo, dá para escolher a língua do app nas configurações do sistema). As transcrições vêm em qualquer idioma que o YouTube oferece.
+
 ## Telas
 
 | Início | Busca | Leitor | Exportar |
@@ -71,7 +73,7 @@ Flutter 3.47 / Dart, só Android. Todo o conhecimento sobre o YouTube fica num �
 
 ### Qualidade
 
-- **170 testes automáticos** (unidade e widget), rodados pelo GitHub Actions a cada mudança na `main` e em todo pull request. Análise estática sem nenhum aviso.
+- **207 testes automáticos** (unidade e widget), rodados pelo GitHub Actions a cada mudança na `main` e em todo pull request. Análise estática sem nenhum aviso.
 - Os testes cobrem os caminhos reais que quebraram no desenvolvimento, por exemplo o desfazer de uma busca apagada, com sequências aleatórias de ações.
 - Cada versão também é testada à mão no emulador e num celular real.
 

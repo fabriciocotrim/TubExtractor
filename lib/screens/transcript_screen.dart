@@ -11,6 +11,7 @@ import '../core/formatters.dart';
 import '../core/job.dart';
 import '../core/models.dart';
 import '../core/zip_builder.dart';
+import '../l10n/l10n.dart';
 import '../widgets/crystal.dart';
 import '../widgets/motion.dart';
 
@@ -115,13 +116,14 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
     await Clipboard.setData(ClipboardData(text: text));
     if (mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Transcrição copiada.')));
+          .showSnackBar(SnackBar(content: Text(l10nOf(context).transcriptCopied)));
     }
   }
 
   Future<void> _exportFile({required bool share}) async {
     final f = widget.settings.format;
-    final content = render(t, f, widget.settings.timestamps);
+    final l = l10nOf(context);
+    final content = render(t, f, widget.settings.timestamps, l.exportLabels);
     final name = safeFileName(t.title, t.videoId, f.extension);
     final bytes = utf8.encode(content);
     try {
@@ -138,7 +140,7 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
         );
         if (uri != null && mounted) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Arquivo salvo.')));
+              .showSnackBar(SnackBar(content: Text(l.fileSaved)));
         }
       }
     } catch (_) {
@@ -146,9 +148,7 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              share
-                  ? 'Não foi possível compartilhar o arquivo.'
-                  : 'Não foi possível salvar o arquivo.',
+              share ? l.shareFileFailed : l.saveFileFailed,
             ),
           ),
         );
@@ -165,6 +165,7 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
   Widget build(BuildContext context) {
     final q = _search.text.trim().toLowerCase();
     final scheme = Theme.of(context).colorScheme;
+    final l = l10nOf(context);
     return CrystalPage(
       child: Scaffold(
         appBar: AppBar(
@@ -176,8 +177,8 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
                     key: const ValueKey('search'),
                     controller: _search,
                     autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Buscar na transcrição',
+                    decoration: InputDecoration(
+                      hintText: l.findInTranscript,
                       filled: false,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -200,22 +201,22 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
                       q.isEmpty
                           ? ''
                           : _matches.isEmpty
-                          ? 'Nenhum'
-                          : '${_current + 1} de ${_matches.length}',
+                          ? l.noMatches
+                          : l.matchPosition(_current + 1, _matches.length),
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Anterior',
+                    tooltip: l.previous,
                     icon: const Icon(Icons.keyboard_arrow_up),
                     onPressed: () => _step(-1),
                   ),
                   IconButton(
-                    tooltip: 'Próximo',
+                    tooltip: l.next,
                     icon: const Icon(Icons.keyboard_arrow_down),
                     onPressed: () => _step(1),
                   ),
                   IconButton(
-                    tooltip: 'Fechar busca',
+                    tooltip: l.closeFind,
                     icon: const Icon(Icons.close),
                     onPressed: () => setState(() {
                       _searching = false;
@@ -226,17 +227,17 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
                 ]
               : [
                   IconButton(
-                    tooltip: 'Buscar',
+                    tooltip: l.find,
                     icon: const Icon(Icons.search),
                     onPressed: () => setState(() => _searching = true),
                   ),
                   IconButton(
-                    tooltip: 'Copiar tudo',
+                    tooltip: l.copyAll,
                     icon: const Icon(Icons.copy),
                     onPressed: _copy,
                   ),
                   PopupMenuButton<String>(
-                    tooltip: 'Mais opções',
+                    tooltip: l.moreOptions,
                     onSelected: (v) => switch (v) {
                       'time' => setState(() => _showTime = !_showTime),
                       'save' => _exportFile(share: false),
@@ -248,21 +249,19 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
                       CheckedPopupMenuItem(
                         value: 'time',
                         checked: _showTime,
-                        child: const Text('Mostrar tempo'),
+                        child: Text(l.showTime),
                       ),
                       PopupMenuItem(
                         value: 'save',
-                        child: Text('Salvar ${widget.settings.format.label}'),
+                        child: Text(l.saveFormat(widget.settings.format.label)),
                       ),
                       PopupMenuItem(
                         value: 'share',
-                        child: Text(
-                          'Compartilhar ${widget.settings.format.label}',
-                        ),
+                        child: Text(l.shareFormat(widget.settings.format.label)),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'yt',
-                        child: Text('Abrir no YouTube'),
+                        child: Text(l.openInYoutube),
                       ),
                     ],
                   ),
@@ -289,7 +288,7 @@ class _TranscriptScreenState extends State<TranscriptScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Legenda: ${t.trackLabel} · ${t.segments.length} trechos',
+                      l.trackInfo(l.track(t), l.lineCount(t.segments.length)),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

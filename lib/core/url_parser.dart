@@ -1,4 +1,4 @@
-﻿/// Turns pasted or shared text into YouTube targets.
+/// Turns pasted or shared text into YouTube targets.
 ///
 /// Only YouTube hosts and well-formed IDs are accepted. Everything else is
 /// reported as invalid, never fetched.
@@ -33,27 +33,9 @@ class ParseResult {
   final List<Target> targets;
   final List<String> invalid;
 
-  /// What was understood, e.g. "Reconhecido: 2 vídeos, 1 canal".
-  String get recognizedText {
-    final kinds = <String>[];
-    final v = targets.where((t) => t.kind == TargetKind.video).length;
-    final pl = targets.where((t) => t.kind == TargetKind.playlist).length;
-    final ch = targets.where((t) => t.kind == TargetKind.channel).length;
-    if (v > 0) kinds.add('$v vídeo${v > 1 ? 's' : ''}');
-    if (pl > 0) kinds.add('$pl playlist${pl > 1 ? 's' : ''}');
-    if (ch > 0) kinds.add('$ch cana${ch > 1 ? 'is' : 'l'}');
-    return kinds.isEmpty ? 'Nenhum link do YouTube reconhecido' : 'Reconhecido: ${kinds.join(', ')}';
-  }
-
-  /// Links that will be skipped, e.g. "1 link ignorado", or null.
-  String? get ignoredText => invalid.isEmpty
-      ? null
-      : invalid.length == 1
-          ? '1 link ignorado'
-          : '${invalid.length} links ignorados';
-
-  /// Line shown under the input, e.g. "Reconhecido: 1 vídeo · 1 link ignorado".
-  String get summary => [recognizedText, ?ignoredText].join(' · ');
+  /// How many targets of [kind] were understood. The screen turns the
+  /// counts into "Recognized: 2 videos, 1 channel · 1 link ignored".
+  int count(TargetKind kind) => targets.where((t) => t.kind == kind).length;
 }
 
 // A token that looks like a YouTube link, not just a word such as "youtuber".

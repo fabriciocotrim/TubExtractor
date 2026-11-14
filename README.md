@@ -18,7 +18,7 @@
 <p align="center">English · <a href="README.pt-BR.md">Português</a></p>
 
 <p align="center">
-  <img src="docs/media/demo.gif" width="300" alt="Share a channel link, fetch 10 transcripts, read one, export a ZIP">
+  <img src="docs/media/en/demo.gif" width="300" alt="Share a channel link, fetch 10 transcripts, read one, export a ZIP">
 </p>
 
 ## What it does
@@ -35,14 +35,14 @@ Paste a YouTube link, or tap **Share** in the YouTube app. TubExtractor fetches 
 - **Resumes:** an interrupted search continues when you open the app again. Deleted searches can be undone for 5 seconds.
 - **Private:** no account, no analytics. The app talks only to YouTube. See the [privacy policy](artefatos/docs/PRIVACY_POLICY.md).
 
-The interface is in Brazilian Portuguese. Transcripts come in any language YouTube offers.
+The interface is in English and Portuguese and follows the phone's language (on Android 13 and later you can also pick the app's language in the system settings). Transcripts come in any language YouTube offers.
 
 ## Screens
 
 | Home | Search | Reader | Export |
 |:---:|:---:|:---:|:---:|
-| <img src="docs/media/home-light.png" width="190" alt="Home, light"> | <img src="docs/media/job-light.png" width="190" alt="Search results, light"> | <img src="docs/media/reader-light.png" width="190" alt="Reader with search, light"> | <img src="docs/media/export-light.png" width="190" alt="Export sheet, light"> |
-| <img src="docs/media/home-dark.png" width="190" alt="Home, dark"> | <img src="docs/media/job-dark.png" width="190" alt="Search results, dark"> | <img src="docs/media/reader-dark.png" width="190" alt="Reader with search, dark"> | <img src="docs/media/export-dark.png" width="190" alt="Export sheet, dark"> |
+| <img src="docs/media/en/home-light.png" width="190" alt="Home, light"> | <img src="docs/media/en/job-light.png" width="190" alt="Search results, light"> | <img src="docs/media/en/reader-light.png" width="190" alt="Reader with search, light"> | <img src="docs/media/en/export-light.png" width="190" alt="Export sheet, light"> |
+| <img src="docs/media/en/home-dark.png" width="190" alt="Home, dark"> | <img src="docs/media/en/job-dark.png" width="190" alt="Search results, dark"> | <img src="docs/media/en/reader-dark.png" width="190" alt="Reader with search, dark"> | <img src="docs/media/en/export-dark.png" width="190" alt="Export sheet, dark"> |
 
 ## Install
 
@@ -73,7 +73,7 @@ Flutter 3.47 / Dart, Android only. All knowledge about YouTube lives in one modu
 
 ### Quality
 
-- **170 automated tests** (unit and widget), run by GitHub Actions on every change to `main` and on every pull request. Static analysis with zero warnings.
+- **207 automated tests** (unit and widget), run by GitHub Actions on every change to `main` and on every pull request. Static analysis with zero warnings.
 - Tests cover the real paths that broke in development, for example the undo of a deleted search, with random sequences of actions.
 - Every release is also tested by hand on an emulator and on a real phone.
 

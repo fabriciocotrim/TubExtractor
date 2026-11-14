@@ -1,4 +1,4 @@
-﻿/// Runs jobs: expands links into videos, then fetches transcripts in a
+/// Runs jobs: expands links into videos, then fetches transcripts in a
 /// polite queue. State is saved after every change, so work resumes after a
 /// restart.
 library;
@@ -150,6 +150,9 @@ class JobRunner {
       _markOk(item, cached, fromCache: true);
       return true;
     }
+    // Paused (or deleted) while reading the cache: the item stays pending and
+    // no request leaves after the pause.
+    if (_cancel.contains(job.id)) return true;
     try {
       final out = await source.fetchTranscript(item.videoId, lang);
       await store.writeCache(lang, out);
@@ -181,7 +184,7 @@ class JobRunner {
     final parsed = parseInput(job.input);
     job.messages
       ..clear()
-      ..addAll(parsed.invalid.map((s) => 'Link ignorado (não é do YouTube ou está incompleto): $s'));
+      ..addAll(parsed.invalid.map((s) => Notice(NoticeCode.linkIgnored, [s])));
     final limit = job.settings.limit.clamp(1, maxVideosPerJob);
     final ids = <String>[];
     final seen = <String>{};
@@ -200,7 +203,7 @@ class JobRunner {
         return false;
       }
       if (ids.length >= limit) {
-        job.messages.add('Chegou ao máximo de $limit vídeos. O resto ficou de fora.');
+        job.messages.add(Notice(NoticeCode.limitReached, ['$limit']));
         break;
       }
       try {
@@ -222,14 +225,14 @@ class JobRunner {
           await _changed(job);
           return false;
         }
-        final what = t.kind == TargetKind.playlist ? 'Playlist não encontrada ou privada' : 'Canal não encontrado ou privado';
-        job.messages.add('$what: ${t.source}');
+        final what = t.kind == TargetKind.playlist ? NoticeCode.playlistNotFound : NoticeCode.channelNotFound;
+        job.messages.add(Notice(what, [t.source]));
       }
     }
     job.items
       ..clear()
       ..addAll(ids.map(JobItem.new));
-    if (ids.isEmpty && job.messages.isEmpty) job.messages.add('Nenhum vídeo encontrado.');
+    if (ids.isEmpty && job.messages.isEmpty) job.messages.add(const Notice(NoticeCode.noVideos));
     await _changed(job);
     return true;
   }

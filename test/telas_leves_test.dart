@@ -19,6 +19,7 @@ import 'package:subshaul/widgets/crystal.dart';
 import 'package:subshaul/widgets/motion.dart';
 
 import 'job_runner_test.dart' show FakeSource;
+import 'l10n_helper.dart';
 
 /// App with one finished job (one ready video), on a temp folder.
 Future<(AppState, Job)> _appWithJob(WidgetTester tester) async {
@@ -109,6 +110,9 @@ void main() {
   testWidgets('leitor com 3.000 trechos monta poucos e a busca leva ao trecho certo', (tester) async {
     final (app, job) = await _appWithJob(tester);
     await tester.pumpWidget(MaterialApp(
+      locale: ptLocale,
+      localizationsDelegates: l10nDelegates,
+      supportedLocales: appLocales,
       theme: crystalTheme(Brightness.light),
       home: TranscriptScreen(
         app: app,
@@ -165,6 +169,9 @@ void main() {
       segments: const [Segment(0, 1000, 'um'), Segment(1000, 1000, 'dois')],
     );
     await tester.pumpWidget(MaterialApp(
+      locale: ptLocale,
+      localizationsDelegates: l10nDelegates,
+      supportedLocales: appLocales,
       theme: crystalTheme(Brightness.light),
       home: TranscriptScreen(app: app, transcript: short, settings: job.settings),
     ));
@@ -189,6 +196,9 @@ void main() {
       addTearDown(tester.view.reset);
       final (app, job) = await _appWithJob(tester);
       await tester.pumpWidget(MaterialApp(
+        locale: ptLocale,
+        localizationsDelegates: l10nDelegates,
+        supportedLocales: appLocales,
         theme: crystalTheme(Brightness.light),
         home: const Scaffold(body: Text('início')),
       ));
@@ -276,11 +286,15 @@ void main() {
   testWidgets('barra de progresso: nulo → 0 não passa por cheio', (tester) async {
     Widget at(double? v) => MediaQuery(
       data: const MediaQueryData(),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Theme(
-          data: crystalTheme(Brightness.dark),
-          child: SizedBox(width: 200, child: CrystalProgress(value: v, running: false)),
+      child: Localizations(
+        locale: ptLocale,
+        delegates: l10nDelegates,
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Theme(
+            data: crystalTheme(Brightness.dark),
+            child: SizedBox(width: 200, child: CrystalProgress(value: v, running: false)),
+          ),
         ),
       ),
     );
@@ -327,6 +341,9 @@ void main() {
       final (app, _) = await _appWithJob(tester);
       final job = bigJob(500);
       await tester.pumpWidget(MaterialApp(
+        locale: ptLocale,
+        localizationsDelegates: l10nDelegates,
+        supportedLocales: appLocales,
         theme: crystalTheme(Brightness.light),
         home: JobScreen(app: app, job: job),
       ));
@@ -350,6 +367,9 @@ void main() {
       final (app, _) = await _appWithJob(tester);
       final job = bigJob(500);
       await tester.pumpWidget(MaterialApp(
+        locale: ptLocale,
+        localizationsDelegates: l10nDelegates,
+        supportedLocales: appLocales,
         theme: crystalTheme(Brightness.light),
         home: JobScreen(app: app, job: job),
       ));
@@ -372,6 +392,9 @@ void main() {
     testWidgets('lista curta: a folha abraça os itens', (tester) async {
       final (app, _) = await _appWithJob(tester);
       await tester.pumpWidget(MaterialApp(
+        locale: ptLocale,
+        localizationsDelegates: l10nDelegates,
+        supportedLocales: appLocales,
         theme: crystalTheme(Brightness.light),
         home: JobScreen(app: app, job: bigJob(2)),
       ));
@@ -383,6 +406,7 @@ void main() {
 
   testWidgets('tema: progresso não reconstrói o app; troca de tema sim', (tester) async {
     final (app, _) = await _appWithJob(tester);
+    phoneInPortuguese(tester);
     await tester.pumpWidget(SubshaulApp(app: app, intake: _FakeIntake()));
     await tester.pump();
     final before = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -402,6 +426,7 @@ void main() {
   testWidgets('trocar o estado do app troca o ouvinte do tema', (tester) async {
     final (first, _) = await _appWithJob(tester);
     final (second, _) = await _appWithJob(tester);
+    phoneInPortuguese(tester);
     await tester.pumpWidget(SubshaulApp(app: first, intake: _FakeIntake()));
     await tester.pumpWidget(SubshaulApp(app: second, intake: _FakeIntake()));
     await tester.runAsync(() => second.setThemeMode(ThemeMode.dark));
@@ -414,6 +439,7 @@ void main() {
     tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
     final (app, _) = await _appWithJob(tester);
+    phoneInPortuguese(tester);
     await tester.pumpWidget(SubshaulApp(app: app, intake: _FakeIntake()));
     await tester.pump();
     expect(tester.widget<MaterialApp>(find.byType(MaterialApp)).themeAnimationDuration, Duration.zero);
@@ -423,6 +449,9 @@ void main() {
     final (app, _) = await _appWithJob(tester);
     final intake = _FakeIntake();
     await tester.pumpWidget(MaterialApp(
+      locale: ptLocale,
+      localizationsDelegates: l10nDelegates,
+      supportedLocales: appLocales,
       theme: crystalTheme(Brightness.light),
       home: HomeScreen(app: app, intake: intake),
     ));

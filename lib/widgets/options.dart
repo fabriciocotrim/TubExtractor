@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/languages.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import 'motion.dart';
 
 class FormatSelector extends StatelessWidget {
@@ -74,6 +75,7 @@ class TimestampSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = l10nOf(context);
     // Fades and resizes when the format switches between the two cases.
     return Resize(
       child: SwapIn(
@@ -81,15 +83,15 @@ class TimestampSelector extends StatelessWidget {
         child: !format.supportsTimestampOption
             ? Text(
                 key: const ValueKey('fixed'),
-                '${format.label} já traz o tempo de cada trecho.',
+                l.timestampsBuiltIn(format.label),
                 style: Theme.of(context).textTheme.bodySmall,
               )
             : SlidingTabs<TimestampMode>(
                 key: const ValueKey('choice'),
-                options: const [
-                  (TimestampMode.off, 'Sem tempo'),
-                  (TimestampMode.on, 'Com tempo'),
-                  (TimestampMode.both, 'Os dois'),
+                options: [
+                  (TimestampMode.off, l.timestampsOff),
+                  (TimestampMode.on, l.timestampsOn),
+                  (TimestampMode.both, l.timestampsBoth),
                 ],
                 value: value,
                 onChanged: onChanged,
@@ -107,7 +109,7 @@ class LanguageField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => OutlinedButton.icon(
         icon: const Icon(Icons.translate),
-        label: Text('${languageName(code)} ($code)'),
+        label: Text('${l10nOf(context).language(code)} ($code)'),
         onPressed: () async {
           final picked = await showModalBottomSheet<String>(
             context: context,
@@ -141,9 +143,11 @@ class _LanguageSheetState extends State<_LanguageSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final list = languages
-        .where((l) => q.isEmpty || _fold(l.name).contains(_fold(q)) || l.code.toLowerCase().contains(q.toLowerCase()))
-        .toList();
+    final t = l10nOf(context);
+    // Either name finds a language ("alemão" or "German"), and the code too.
+    bool hit(Language l) =>
+        _fold(l.pt).contains(_fold(q)) || _fold(l.en).contains(_fold(q)) || l.code.toLowerCase().contains(q.toLowerCase());
+    final list = languages.where((l) => q.isEmpty || hit(l)).toList();
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.8,
       child: Column(children: [
@@ -151,7 +155,7 @@ class _LanguageSheetState extends State<_LanguageSheet> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: TextField(
             autofocus: true,
-            decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar idioma (nome ou código)'),
+            decoration: InputDecoration(prefixIcon: const Icon(Icons.search), hintText: t.searchLanguage),
             onChanged: (v) => setState(() => q = v),
           ),
         ),
@@ -159,7 +163,7 @@ class _LanguageSheetState extends State<_LanguageSheet> {
           child: ListView.builder(
             itemCount: list.length,
             itemBuilder: (_, i) => ListTile(
-              title: Text(list[i].name),
+              title: Text(list[i].nameIn(t.appLanguage)),
               trailing: Text(list[i].code),
               selected: list[i].code == widget.current,
               onTap: () => Navigator.pop(context, list[i].code),
@@ -181,10 +185,13 @@ class LimitSelector extends StatelessWidget {
   @override
   // Outlined, like the other fields, instead of the old underlined dropdown.
   Widget build(BuildContext context) => DropdownMenu<int>(
+        // A new list when the app language changes, so the shown entry
+        // follows it.
+        key: ValueKey(l10nOf(context).localeName),
         initialSelection: limitOptions.contains(value) ? value : 500,
         width: 200,
         requestFocusOnTap: false,
-        dropdownMenuEntries: [for (final n in limitOptions) DropdownMenuEntry(value: n, label: '$n vídeos')],
+        dropdownMenuEntries: [for (final n in limitOptions) DropdownMenuEntry(value: n, label: l10nOf(context).videoCount(n))],
         onSelected: (v) => v == null ? null : onChanged(v),
       );
 }

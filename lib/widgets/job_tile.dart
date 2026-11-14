@@ -2,32 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../core/job.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import 'crystal.dart';
 import 'motion.dart';
-
-String jobStatusText(Job j, {required bool running}) {
-  final total = j.items.length;
-  final done = j.okCount + j.failedCount;
-  switch (j.state) {
-    case JobState.expanding:
-      return running ? 'Buscando a lista de vídeos…' : 'Aguardando';
-    case JobState.running:
-      return running
-          ? 'Processando $done de $total'
-          : 'Interrompido · $done de $total';
-    case JobState.paused:
-      final why = switch (j.pauseReason) {
-        FailureReason.network => ': sem conexão',
-        FailureReason.rateLimited =>
-          ': YouTube bloqueou por excesso de pedidos',
-        _ => '',
-      };
-      return 'Pausado$why · $done de $total';
-    case JobState.done:
-      return '${j.okCount} pronto${j.okCount == 1 ? '' : 's'}'
-          '${j.failedCount > 0 ? ' · ${j.failedCount} com falha' : ''}';
-  }
-}
 
 class JobTile extends StatelessWidget {
   const JobTile({
@@ -47,6 +24,7 @@ class JobTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final c = Crystal.of(context);
     final text = Theme.of(context).textTheme;
+    final l = l10nOf(context);
     final (icon, color) = switch (job.state) {
       JobState.done => (Icons.check_circle_outline, c.success),
       JobState.paused => (
@@ -67,7 +45,7 @@ class JobTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  job.label,
+                  l.jobLabel(job),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: text.titleSmall,
@@ -88,7 +66,7 @@ class JobTile extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: TextSwap(
-                        jobStatusText(job, running: running),
+                        l.jobStatus(job, running: running),
                         style: text.bodySmall,
                         maxLines: 1,
                       ),

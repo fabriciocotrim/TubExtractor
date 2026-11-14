@@ -1,4 +1,4 @@
-﻿/// Jobs and their on-disk storage. A job survives app restarts.
+/// Jobs and their on-disk storage. A job survives app restarts.
 library;
 
 import 'dart:convert';
@@ -49,7 +49,9 @@ class JobItem {
   String? title;
   ItemStatus status;
   FailureReason? reason;
-  String? note;
+
+  /// Fallback used for this video's captions, e.g. another language.
+  Notice? note;
   bool fromCache;
 
   Map<String, dynamic> toJson() => {
@@ -57,7 +59,7 @@ class JobItem {
         'title': title,
         'status': status.name,
         'reason': reason?.name,
-        'note': note,
+        'note': note?.toJson(),
         'fromCache': fromCache,
       };
 
@@ -66,7 +68,7 @@ class JobItem {
         title: j['title'] as String?,
         status: ItemStatus.values.asNameMap()[j['status']] ?? ItemStatus.pending,
         reason: FailureReason.values.asNameMap()[j['reason']],
-        note: j['note'] as String?,
+        note: Notice.fromJson(j['note']),
         fromCache: j['fromCache'] as bool? ?? false,
       );
 }
@@ -79,7 +81,7 @@ class Job {
     required this.settings,
     this.state = JobState.expanding,
     List<JobItem>? items,
-    List<String>? messages,
+    List<Notice>? messages,
     this.pauseReason,
   })  : items = items ?? [],
         messages = messages ?? [];
@@ -92,7 +94,7 @@ class Job {
   final List<JobItem> items;
 
   /// Problems with the input itself (invalid link, private playlist…).
-  final List<String> messages;
+  final List<Notice> messages;
   FailureReason? pauseReason;
 
   int get okCount => items.where((i) => i.status == ItemStatus.ok).length;
@@ -102,14 +104,14 @@ class Job {
 
 
   /// Short name for the history: the video title when there is one video,
-  /// else the first valid link without "https://www." plus how many more.
-  String get label {
-    if (items.length == 1 && items.single.title != null) return items.single.title!;
+  /// else the first valid link without "https://www." and how many more
+  /// links there are. The screen writes "and N more" in its language.
+  ({String name, int more}) get label {
+    if (items.length == 1 && items.single.title != null) return (name: items.single.title!, more: 0);
     final links = parseInput(input).targets.map((t) => t.source).toList();
-    if (links.isEmpty) return input.trim();
+    if (links.isEmpty) return (name: input.trim(), more: 0);
     final first = links.first.replaceFirst(RegExp(r'^https?://', caseSensitive: false), '').replaceFirst('www.', '');
-    final more = links.length - 1;
-    return more > 0 ? '$first e mais $more' : first;
+    return (name: first, more: links.length - 1);
   }
 
   Map<String, dynamic> toJson() => {
@@ -120,7 +122,7 @@ class Job {
         'settings': settings.toJson(),
         'state': state.name,
         'pauseReason': pauseReason?.name,
-        'messages': messages,
+        'messages': messages.map((m) => m.toJson()).toList(),
         'items': items.map((i) => i.toJson()).toList(),
       };
 
@@ -131,7 +133,8 @@ class Job {
         settings: JobSettings.fromJson(j['settings'] as Map<String, dynamic>),
         state: JobState.values.asNameMap()[j['state']] ?? JobState.paused,
         pauseReason: FailureReason.values.asNameMap()[j['pauseReason']],
-        messages: (j['messages'] as List? ?? const []).cast<String>(),
+        // Before 1.5.0 a message was a Portuguese sentence; Notice reads both.
+        messages: [for (final m in j['messages'] as List? ?? const []) ?Notice.fromJson(m)],
         items: (j['items'] as List? ?? const []).map((e) => JobItem.fromJson(e as Map<String, dynamic>)).toList(),
       );
 }
@@ -206,7 +209,7 @@ class Store {
       final j = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
       return FetchOutcome(
         Transcript.fromJson(j['transcript'] as Map<String, dynamic>),
-        note: j['note'] as String?,
+        note: Notice.fromJson(j['note']),
         cacheable: j['cacheable'] as bool? ?? true,
       );
     } catch (_) {
@@ -216,7 +219,7 @@ class Store {
 
   Future<void> writeCache(String lang, FetchOutcome o) async {
     final f = File('${_cache.path}/${_key(o.transcript.videoId, lang)}.json');
-    await f.writeAsString(jsonEncode({'transcript': o.transcript.toJson(), 'note': o.note, 'cacheable': o.cacheable}));
+    await f.writeAsString(jsonEncode({'transcript': o.transcript.toJson(), 'note': o.note?.toJson(), 'cacheable': o.cacheable}));
   }
 
   Future<int> cacheSizeBytes() async {

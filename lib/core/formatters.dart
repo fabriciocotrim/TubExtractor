@@ -5,6 +5,40 @@ import 'dart:convert';
 
 import 'models.dart';
 
+/// Words written into exported files, in the app's language at export time
+/// (D-30 A). Only TXT and Markdown headers and the manifest's text columns
+/// use them; column names, JSON keys, SRT and VTT never change.
+class ExportLabels {
+  const ExportLabels({
+    required this.channel,
+    required this.video,
+    required this.language,
+    required this.text,
+    required this.withTimestamps,
+    required this.auto,
+    required this.translated,
+    required this.reasons,
+  });
+
+  /// Header words: "Channel", "Video", "Language".
+  final String channel;
+  final String video;
+  final String language;
+
+  /// Markdown section titles when both text and timestamps are exported.
+  final String text;
+  final String withTimestamps;
+
+  /// Track label words: "en (auto) (translated)".
+  final String auto;
+  final String translated;
+
+  /// The manifest's reason_text for each failure reason.
+  final Map<FailureReason, String> reasons;
+
+  String track(Transcript t) => trackLabel(t, auto: auto, translated: translated);
+}
+
 String formatClock(int ms) {
   final total = ms ~/ 1000;
   final h = total ~/ 3600;
@@ -53,20 +87,20 @@ List<String> paragraphs(List<Segment> segs) {
   return out;
 }
 
-String render(Transcript t, OutputFormat f, TimestampMode ts) => switch (f) {
-      OutputFormat.txt => toTxt(t, ts),
+String render(Transcript t, OutputFormat f, TimestampMode ts, ExportLabels l) => switch (f) {
+      OutputFormat.txt => toTxt(t, ts, l),
       OutputFormat.srt => toSrt(t),
       OutputFormat.vtt => toVtt(t),
-      OutputFormat.md => toMarkdown(t, ts),
+      OutputFormat.md => toMarkdown(t, ts, l),
       OutputFormat.json => toJson(t),
     };
 
-String toTxt(Transcript t, TimestampMode ts) {
+String toTxt(Transcript t, TimestampMode ts, ExportLabels l) {
   final b = StringBuffer()
     ..writeln(t.title)
     ..writeln(t.channel)
     ..writeln(t.url)
-    ..writeln('Idioma: ${t.trackLabel}')
+    ..writeln('${l.language}: ${l.track(t)}')
     ..writeln();
   if (ts == TimestampMode.off || ts == TimestampMode.both) {
     b.writeln(paragraphs(t.segments).join('\n\n'));
@@ -110,21 +144,21 @@ String toVtt(Transcript t) {
 
 String _mdEscape(String s) => s.replaceAllMapped(RegExp(r'([\\`*_\[\]#<>])'), (m) => '\\${m[1]}');
 
-String toMarkdown(Transcript t, TimestampMode ts) {
+String toMarkdown(Transcript t, TimestampMode ts, ExportLabels l) {
   final b = StringBuffer()
     ..writeln('# ${_mdEscape(t.title)}')
     ..writeln()
-    ..writeln('- Canal: ${_mdEscape(t.channel)}')
-    ..writeln('- Vídeo: <${t.url}>')
-    ..writeln('- Idioma: ${t.trackLabel}')
+    ..writeln('- ${l.channel}: ${_mdEscape(t.channel)}')
+    ..writeln('- ${l.video}: <${t.url}>')
+    ..writeln('- ${l.language}: ${l.track(t)}')
     ..writeln();
   if (ts == TimestampMode.off || ts == TimestampMode.both) {
-    if (ts == TimestampMode.both) b.writeln('## Texto\n');
+    if (ts == TimestampMode.both) b.writeln('## ${l.text}\n');
     b.writeln(paragraphs(t.segments).map(_mdEscape).join('\n\n'));
     b.writeln();
   }
   if (ts == TimestampMode.on || ts == TimestampMode.both) {
-    if (ts == TimestampMode.both) b.writeln('## Com timestamps\n');
+    if (ts == TimestampMode.both) b.writeln('## ${l.withTimestamps}\n');
     for (final s in t.segments) {
       b.writeln('[${formatClock(s.startMs)}](${t.url}&t=${s.startMs ~/ 1000}s) ${_mdEscape(s.text)}  ');
     }

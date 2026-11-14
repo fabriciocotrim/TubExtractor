@@ -1,9 +1,10 @@
-﻿// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print
 // Live check against the real YouTube. Not part of `flutter test` (needs
 // network and can be rate-limited). Run: dart run tool/live_check.dart
 // Use it when YouTube changes something and the app stops fetching.
 import 'dart:io';
 
+import 'package:subshaul/core/formatters.dart';
 import 'package:subshaul/core/job.dart';
 import 'package:subshaul/core/job_runner.dart';
 import 'package:subshaul/core/models.dart';
@@ -63,7 +64,19 @@ Future<void> main() async {
   }
   final t = await store.readCache('dQw4w9WgXcQ', 'en');
   entries.add(ExportEntry(videoId: 'dQw4w9WgXcQ', transcript: t!.transcript));
-  final zip = buildZip(entries, OutputFormat.srt, TimestampMode.on);
+  // This command-line check runs without Flutter, so it cannot read the
+  // translation files; English words stand in for them.
+  const labels = ExportLabels(
+    channel: 'Channel',
+    video: 'Video',
+    language: 'Language',
+    text: 'Text',
+    withTimestamps: 'With timestamps',
+    auto: 'auto',
+    translated: 'translated',
+    reasons: {},
+  );
+  final zip = buildZip(entries, OutputFormat.srt, TimestampMode.on, labels);
   check(zip.bytes.length > 500, 'ZIP gerado (${zip.bytes.length} bytes)');
 
   await dir.delete(recursive: true);

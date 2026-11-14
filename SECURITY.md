@@ -13,6 +13,7 @@ Supported version: the latest release only.
 - **Input:** shared or pasted text is limited to 20,000 characters and parsed against YouTube hosts and 11-character video ids only.
 - **Export:** file names in the ZIP cannot contain path separators; CSV cells that start with a formula character are escaped.
 - **Rate limiting:** 2 parallel requests, pauses and retries; a job pauses after repeated blocks by YouTube; 500 videos per job at most.
+- **Translated text:** links enter translated sentences as plain text; a link with `{count}` or `%s` in it shows literally.
 - **Release signing:** the signing key stays outside the repository; a release build fails without it.
 - **Accepted risks:** YouTube's Terms restrict automated access; the app code can be copied (it holds no secret).
 - **Gate before every release:** gitleaks (code and full Git history), semgrep (OWASP Top 10 and secrets), osv-scanner, all tests. Results are recorded below, in Portuguese.
@@ -48,6 +49,7 @@ Nome visível e repositório: **TubExtractor**. O applicationId segue `subshaul`
 
 ## Pacotes (princípio 4)
 Todos do pub.dev, com publicador verificado ou mantenedor conhecido e milhões de downloads: `http`, `path_provider`, `shared_preferences`, `share_plus`, `url_launcher` (dart.dev / flutter.dev / fluttercommunity.dev), `archive` (mantido desde 2013), `file_picker` (mantido desde 2018).
+Tradução do app (1.5.0): `flutter_localizations` (vem com o SDK do Flutter) e `intl` 0.20.3 (publicador verificado dart.dev). A versão do `intl` é a que o `flutter_localizations` fixa.
 Só para testes (não vai no APK): `shared_preferences_platform_interface` (flutter.dev).
 Fontes Inter e JetBrains Mono vão dentro do app (`assets/fonts/`, licença OFL). O app não baixa fonte da internet.
 
@@ -75,3 +77,14 @@ Nada sai do aparelho além dos pedidos ao YouTube. Sem analytics, sem log em rel
 | `osv-scanner` | sem vulnerabilidades |
 | `flutter test` | 168 testes passando (inclui `test/readme_test.dart`: links e imagens das páginas) |
 | CI (`.github/workflows/tests.yml`) | `flutter analyze` + `flutter test` a cada envio; `contents: read`; Actions fixadas por SHA; sem segredos |
+
+## Portão (fase 7) — 2026-11-13, versão 1.5.0 (app em inglês e português)
+| Ferramenta | Resultado |
+|---|---|
+| `gitleaks dir` em `lib`, `test`, `android/app/src`, `docs` e no APK 1.5.0 (arm64) | sem vazamentos |
+| `gitleaks git` (histórico) | sem vazamentos |
+| `semgrep p/owasp-top-ten p/secrets` (inclui os arquivos novos, ainda fora do git) | 0 achados, 131 regras, 44 arquivos |
+| `osv-scanner` (`pubspec.lock`, 93 pacotes) | sem vulnerabilidades |
+| `flutter test` | 207 testes passando, 5 rodadas seguidas |
+| `flutter analyze` | sem avisos |
+| Texto de fora em frase traduzida | link com `{count}`, `%s` e `$1` aparece literal (`test/l10n_test.dart`) |

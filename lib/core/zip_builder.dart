@@ -10,6 +10,7 @@ import 'formatters.dart';
 import 'models.dart';
 
 /// One row of the manifest. [transcript] is null when the video failed.
+/// [note] is already written in the app's language.
 class ExportEntry {
   const ExportEntry({
     required this.videoId,
@@ -53,7 +54,7 @@ class ZipResult {
   final Map<String, String> fileNames; // videoId -> path in zip
 }
 
-ZipResult buildZip(List<ExportEntry> entries, OutputFormat format, TimestampMode ts) {
+ZipResult buildZip(List<ExportEntry> entries, OutputFormat format, TimestampMode ts, ExportLabels labels) {
   final archive = Archive();
   final used = <String>{};
   final files = <String, String>{};
@@ -71,7 +72,7 @@ ZipResult buildZip(List<ExportEntry> entries, OutputFormat format, TimestampMode
       }
       used.add(name.toLowerCase());
       path = 'transcripts/$name';
-      final data = utf8.encode(render(t, format, ts));
+      final data = utf8.encode(render(t, format, ts, labels));
       archive.addFile(ArchiveFile(path, data.length, data));
       files[t.videoId] = path;
     }
@@ -82,8 +83,8 @@ ZipResult buildZip(List<ExportEntry> entries, OutputFormat format, TimestampMode
       'url': 'https://www.youtube.com/watch?v=${e.videoId}',
       'status': t != null ? 'ok' : 'missing',
       'reason': t != null ? '' : (e.reason ?? FailureReason.unknown).code,
-      'reason_text': t != null ? '' : (e.reason ?? FailureReason.unknown).message,
-      'track': t?.trackLabel ?? '',
+      'reason_text': t != null ? '' : labels.reasons[e.reason ?? FailureReason.unknown] ?? '',
+      'track': t == null ? '' : labels.track(t),
       'file': path ?? '',
       'note': e.note ?? '',
     });

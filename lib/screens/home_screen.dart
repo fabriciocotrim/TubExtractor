@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../app_state.dart';
 import '../core/job.dart';
 import '../core/url_parser.dart';
+import '../l10n/l10n.dart';
 import '../share_intake.dart';
 import '../widgets/crystal.dart';
 import '../widgets/job_tile.dart';
@@ -93,9 +94,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final current = _input.text.trim();
     _input.text = current.isEmpty ? text.trim() : '$current\n${text.trim()}';
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Link recebido. Toque em Buscar transcrições.'),
-      ),
+      SnackBar(content: Text(l10nOf(context).linkReceived)),
     );
   }
 
@@ -111,11 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final parsed = parseInput(_input.text);
     if (parsed.targets.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Nenhum link do YouTube reconhecido. Cole um vídeo, playlist, canal, @handle ou Shorts.',
-          ),
-        ),
+        SnackBar(content: Text(l10nOf(context).noLinkRecognizedHelp)),
       );
       return;
     }
@@ -140,13 +135,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final jobs = app.jobs;
         final parsed = parseInput(_input.text);
         final text = Theme.of(context).textTheme;
+        final l = l10nOf(context);
         return CrystalPage(
           child: Scaffold(
             appBar: AppBar(
               toolbarHeight: 48,
               actions: [
                 IconButton(
-                  tooltip: 'Sobre e cache',
+                  tooltip: l.aboutAndCache,
                   icon: const Icon(Icons.info_outline),
                   onPressed: () => _about(context),
                 ),
@@ -169,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: CrystalButton(
                       onPressed: parsed.targets.isEmpty ? null : _start,
                       icon: Icons.download,
-                      label: 'Buscar transcrições',
+                      label: l.getTranscripts,
                     ),
                   ),
                 ),
@@ -205,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'TRANSCRIÇÕES DO YOUTUBE EM LOTE',
+                                l.tagline,
                                 style: text.labelSmall?.copyWith(
                                   letterSpacing: 1.6,
                                   fontWeight: FontWeight.w600,
@@ -224,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Reveal(
                     index: 1,
                     child: Text(
-                      'Cole links do YouTube e leve o texto de todos os vídeos de uma vez.',
+                      l.intro,
                       style: text.bodyLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -244,18 +240,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             maxLines: 8,
                             keyboardType: TextInputType.url,
                             decoration: InputDecoration(
-                              hintText: 'youtube.com/watch?v=…\n@canal\nyoutube.com/playlist?list=…',
+                              hintText: l.inputHint,
                               suffixIcon: SwapIn(
                                 child: _input.text.isEmpty
                                     ? IconButton(
                                         key: const ValueKey('paste'),
-                                        tooltip: 'Colar',
+                                        tooltip: l.paste,
                                         icon: const Icon(Icons.content_paste),
                                         onPressed: _paste,
                                       )
                                     : IconButton(
                                         key: const ValueKey('clear'),
-                                        tooltip: 'Limpar',
+                                        tooltip: l.clear,
                                         icon: const Icon(Icons.clear),
                                         onPressed: _input.clear,
                                       ),
@@ -268,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               scale: false,
                               child: _input.text.trim().isEmpty
                                   ? Text(
-                                      'Vídeo, playlist, canal, @handle ou Shorts. Um link por linha.',
+                                      l.inputHelp,
                                       key: const ValueKey('hint'),
                                       style: text.bodySmall,
                                     )
@@ -288,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Labeled(
-                            'Formato',
+                            l.formatLabel,
                             FormatSelector(
                               value: s.format,
                               onChanged: (f) =>
@@ -296,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ),
                           ),
                           Labeled(
-                            'Tempo de cada trecho',
+                            l.timestampsOption,
                             TimestampSelector(
                               value: s.timestamps,
                               format: s.format,
@@ -305,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ),
                           ),
                           Labeled(
-                            'Idioma da transcrição',
+                            l.transcriptLanguage,
                             Align(
                               alignment: Alignment.centerLeft,
                               child: LanguageField(
@@ -316,13 +312,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ),
                           ),
                           Labeled(
-                            'Máximo de vídeos',
+                            l.maxVideos,
                             LimitSelector(
                               value: s.limit,
                               onChanged: (n) =>
                                   app.updateSettings(s.copyWith(limit: n)),
                             ),
-                            help: 'Canal: do mais novo ao mais antigo. Playlist: na ordem dela.',
+                            help: l.maxVideosHelp,
                           ),
                         ],
                       ),
@@ -334,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       index: 4,
                       // Comes back with the only job, restored by Desfazer.
                       instant: jobs.length == 1 && jobs.single.id == _restoredId,
-                      child: Text('Histórico', style: text.titleLarge),
+                      child: Text(l.history, style: text.titleLarge),
                     ),
                     const SizedBox(height: 12),
                     for (final (i, j) in jobs.indexed)
@@ -390,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     Padding(
                       padding: const EdgeInsets.only(left: 4),
                       child: Text(
-                        'Deslize uma busca para a esquerda para apagar.',
+                        l.swipeToDelete,
                         style: text.bodySmall,
                       ),
                     ),
@@ -455,23 +451,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('TubExtractor'),
-        content: Text(
-          'Baixa legendas públicas do YouTube direto do seu celular. Não tem conta, servidor nem coleta de dados.\n\n'
-          'Só funciona com vídeos que têm legenda. Legendas automáticas mantêm a pontuação do YouTube.\n\n'
-          'Não é afiliado ao YouTube nem ao Google.\n\n'
-          'Cache no aparelho: $size',
-        ),
+        content: Text(l10nOf(ctx).aboutBody(size)),
         actions: [
           TextButton(
             onPressed: () async {
               await app.clearCache();
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('Limpar cache'),
+            child: Text(l10nOf(ctx).clearCache),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Fechar'),
+            child: Text(l10nOf(ctx).close),
           ),
         ],
       ),
@@ -545,7 +536,7 @@ class _NoticeCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Text(
-                        'Busca apagada.',
+                        l10nOf(context).searchDeleted,
                         style: snack.contentTextStyle ??
                             theme.textTheme.bodyMedium?.copyWith(color: scheme.onInverseSurface),
                       ),
@@ -560,7 +551,7 @@ class _NoticeCard extends StatelessWidget {
                         overlayColor: snack.actionTextColor ?? scheme.inversePrimary,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                       ),
-                      child: const Text('Desfazer'),
+                      child: Text(l10nOf(context).undo),
                     ),
                   ),
                 ],
@@ -584,15 +575,17 @@ class _InputSummary extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final style = Theme.of(context).textTheme.bodySmall;
     final none = parsed.targets.isEmpty;
-    final ignored = parsed.ignoredText;
+    final l = l10nOf(context);
+    final recognized = l.recognizedText(parsed);
+    final ignored = l.ignoredText(parsed);
     return SwapIn(
       scale: false,
       child: Text.rich(
-        key: ValueKey(parsed.summary),
+        key: ValueKey('$recognized|$ignored'),
         TextSpan(
           children: [
             TextSpan(
-              text: parsed.recognizedText,
+              text: recognized,
               style: TextStyle(
                 color: none ? scheme.error : scheme.onSurfaceVariant,
               ),
@@ -626,7 +619,7 @@ class _ThemeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return IconButton(
-      tooltip: dark ? 'Tema claro' : 'Tema escuro',
+      tooltip: dark ? l10nOf(context).lightTheme : l10nOf(context).darkTheme,
       onPressed: () =>
           app.setThemeMode(dark ? ThemeMode.light : ThemeMode.dark),
       icon: SwapIn(

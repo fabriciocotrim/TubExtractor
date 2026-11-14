@@ -12,6 +12,7 @@ import 'package:subshaul/core/url_parser.dart';
 import 'package:subshaul/core/youtube_client.dart';
 
 import 'job_runner_test.dart' show FakeSource;
+import 'l10n_helper.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -44,14 +45,15 @@ void main() {
 
   test('CT-11: link de outro site é ignorado e só o vídeo do YouTube é buscado', () async {
     const input = 'https://google.com\nhttps://youtu.be/dQw4w9WgXcQ';
-    expect(parseInput(input).summary, 'Reconhecido: 1 vídeo · 1 link ignorado');
+    final parsed = parseInput(input);
+    expect('${pt.recognizedText(parsed)} · ${pt.ignoredText(parsed)}', 'Reconhecido: 1 vídeo · 1 link ignorado');
 
     final app = await open();
     final j = app.createJob(input);
     await until(() => j.state == JobState.done && !app.isRunning(j));
     expect(src.fetched, ['dQw4w9WgXcQ']);
     expect(j.items.length, 1);
-    expect(j.messages.single, contains('google.com'));
+    expect(pt.notice(j.messages.single), contains('google.com'));
   });
 
   group('apagar com avisos em sequência', () {
@@ -552,11 +554,11 @@ void main() {
 
   test('nome da busca no histórico: título, ou primeiro link válido e quantos mais', () {
     Job j(String input) => Job(id: 'x', createdAt: DateTime.now(), input: input, settings: const JobSettings());
-    expect(j('https://google.com https://youtu.be/dQw4w9WgXcQ https://www.youtube.com/@mkbhd').label,
+    expect(pt.jobLabel(j('https://google.com https://youtu.be/dQw4w9WgXcQ https://www.youtube.com/@mkbhd')),
         'youtu.be/dQw4w9WgXcQ e mais 1');
-    expect(j('@mkbhd').label, '@mkbhd');
+    expect(pt.jobLabel(j('@mkbhd')), '@mkbhd');
     final one = j('https://youtu.be/dQw4w9WgXcQ')..items.add(JobItem('dQw4w9WgXcQ')..title = 'Never Gonna');
-    expect(one.label, 'Never Gonna');
+    expect(pt.jobLabel(one), 'Never Gonna');
   });
 
   test('CT-10: ao abrir, o app retoma sozinho o job cortado no meio', () async {

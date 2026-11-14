@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app_state.dart';
+import 'l10n/l10n.dart';
 import 'screens/home_screen.dart';
 import 'share_intake.dart';
 import 'widgets/crystal.dart';
@@ -59,6 +61,17 @@ class _SubshaulAppState extends State<SubshaulApp> {
   Widget build(BuildContext context) => MaterialApp(
     title: 'TubExtractor',
     debugShowCheckedModeBanner: false,
+    // English and Portuguese, following the phone (D-27, D-28). A language
+    // change with the app open only redraws the text: the manifest handles
+    // "locale" itself, so no job stops.
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: appLocales,
+    localeListResolutionCallback: (phone, _) => resolveAppLocale(phone),
     theme: SubshaulApp._light,
     darkTheme: SubshaulApp._dark,
     themeMode: _mode,

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:subshaul/widgets/crystal.dart';
 
+import 'l10n_helper.dart';
+
 const aqua = Color(0xFF5EE6C8);
 
 double _contrast(Color a, Color b) {
@@ -71,11 +73,15 @@ void main() {
   testWidgets('progress rod repaints when the theme colors change while paused', (tester) async {
     Widget at(Brightness b) => MediaQuery(
       data: const MediaQueryData(),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Theme(
-          data: crystalTheme(b),
-          child: const SizedBox(width: 200, child: CrystalProgress(value: 0.5, running: false)),
+      child: Localizations(
+        locale: ptLocale,
+        delegates: l10nDelegates,
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Theme(
+            data: crystalTheme(b),
+            child: const SizedBox(width: 200, child: CrystalProgress(value: 0.5, running: false)),
+          ),
         ),
       ),
     );

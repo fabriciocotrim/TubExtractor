@@ -64,6 +64,23 @@ void main() {
   });
   tearDown(() => dir.delete(recursive: true));
 
+  test('pausa durante a leitura do cache: nenhum pedido sai para o YouTube', () async {
+    final gated = _GatedStore(dir);
+    await gated.init();
+    final r = JobRunner(store: gated, source: src, gap: Duration.zero);
+    final j = job('@mkbhd');
+    final done = r.run(j);
+    while (gated.waiting == 0) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    r.pause(j.id);
+    gated.release();
+    await done;
+    expect(src.fetched, isEmpty, reason: 'pedido enviado depois da pausa');
+    expect(j.state, JobState.paused);
+    expect(j.pendingCount, 3, reason: 'o vídeo interrompido volta para a fila');
+  });
+
   test('falha de um vídeo não para o job', () async {
     src.failures['c0000000001'] = FailureReason.noCaptions;
     final j = job('@mkbhd');
@@ -261,5 +278,21 @@ class _SlowFetchSource extends FakeSource {
   Future<FetchOutcome> fetchTranscript(String videoId, String preferredLanguage) async {
     await Future<void>.delayed(const Duration(milliseconds: 50));
     return super.fetchTranscript(videoId, preferredLanguage);
+  }
+}
+
+/// Holds every cache read until [release] — the window where a pause can land
+/// after the worker took an item but before it asks YouTube.
+class _GatedStore extends Store {
+  _GatedStore(super.dir);
+  final _gate = Completer<void>();
+  int waiting = 0;
+  void release() => _gate.complete();
+
+  @override
+  Future<FetchOutcome?> readCache(String videoId, String lang) async {
+    waiting++;
+    await _gate.future;
+    return super.readCache(videoId, lang);
   }
 }

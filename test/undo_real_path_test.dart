@@ -15,6 +15,7 @@ import 'package:subshaul/share_intake.dart';
 
 import 'home_undo_test.dart' show untilDone;
 import 'job_runner_test.dart' show FakeSource;
+import 'l10n_helper.dart';
 
 void main() {
   late Directory dir;
@@ -42,6 +43,7 @@ void main() {
       }
     });
     addTearDown(() => dir.delete(recursive: true));
+    phoneInPortuguese(tester);
     await tester.pumpWidget(SubshaulApp(app: app, intake: ShareIntake()));
     await frames(tester, 1500);
     return jobs.reversed.toList();

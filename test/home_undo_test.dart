@@ -13,6 +13,7 @@ import 'package:subshaul/widgets/crystal.dart';
 
 import 'app_state_test.dart' show FakeClock;
 import 'job_runner_test.dart' show FakeSource;
+import 'l10n_helper.dart';
 
 void main() {
   testWidgets('a busca restaurada fica visível (opacidade 1) logo após o Desfazer', (tester) async {
@@ -36,6 +37,9 @@ void main() {
     addTearDown(() => dir.delete(recursive: true));
 
     await tester.pumpWidget(MaterialApp(
+      locale: ptLocale,
+      localizationsDelegates: l10nDelegates,
+      supportedLocales: appLocales,
       theme: crystalTheme(Brightness.light),
       home: HomeScreen(app: app, intake: ShareIntake()),
     ));
@@ -104,6 +108,9 @@ void main() {
       });
       addTearDown(() => dir.delete(recursive: true));
       await tester.pumpWidget(MaterialApp(
+        locale: ptLocale,
+        localizationsDelegates: l10nDelegates,
+        supportedLocales: appLocales,
         theme: crystalTheme(Brightness.light),
         home: HomeScreen(app: app, intake: ShareIntake()),
       ));

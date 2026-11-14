@@ -6,10 +6,9 @@ import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../core/formatters.dart';
 import '../core/job.dart';
-import '../core/languages.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import '../widgets/crystal.dart';
-import '../widgets/job_tile.dart';
 import '../widgets/motion.dart';
 import '../widgets/options.dart';
 import 'transcript_screen.dart';
@@ -48,6 +47,7 @@ class _JobScreenState extends State<JobScreen> {
   Future<void> _export({required bool share}) async {
     var format = job.settings.format;
     var ts = job.settings.timestamps;
+    final l = l10nOf(context);
     final ok = await showModalBottomSheet<bool>(
       context: context,
       showDragHandle: true,
@@ -59,18 +59,18 @@ class _JobScreenState extends State<JobScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                share ? 'Compartilhar ZIP' : 'Salvar ZIP',
+                share ? l.shareZip : l.saveZip,
                 style: Theme.of(ctx).textTheme.titleMedium,
               ),
               Labeled(
-                'Formato',
+                l.formatLabel,
                 FormatSelector(
                   value: format,
                   onChanged: (f) => set(() => format = f),
                 ),
               ),
               Labeled(
-                'Timestamps',
+                l.exportTimestamps,
                 TimestampSelector(
                   value: ts,
                   format: format,
@@ -79,14 +79,13 @@ class _JobScreenState extends State<JobScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'O ZIP traz uma transcrição por vídeo, mais manifest.csv e manifest.json '
-                'com o status de cada um.',
+                l.zipContents,
                 style: Theme.of(ctx).textTheme.bodySmall,
               ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: Text(share ? 'Compartilhar' : 'Salvar'),
+                child: Text(share ? l.share : l.save),
               ),
             ],
           ),
@@ -96,7 +95,8 @@ class _JobScreenState extends State<JobScreen> {
     if (ok != true || !mounted) return;
     setState(() => _busy = true);
     try {
-      final Uint8List bytes = await app.buildJobZip(job, format, ts);
+      final Uint8List bytes = await app.buildJobZip(job, format, ts,
+          labels: l.exportLabels, noteText: l.notice, notProcessed: l.notProcessedYet);
       if (share) {
         final f = await app.writeTemp(_zipName, bytes);
         await SharePlus.instance.share(
@@ -108,18 +108,19 @@ class _JobScreenState extends State<JobScreen> {
           bytes: bytes,
           mimeType: 'application/zip',
         );
-        if (uri != null) _snack('ZIP salvo.');
+        if (uri != null) _snack(l.zipSaved);
       }
     } catch (_) {
-      _snack('Não foi possível gerar o ZIP. Tente de novo.');
+      _snack(l.zipFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _copyAll() async {
+    final l = l10nOf(context);
     final list = await app.transcriptsOf(job);
-    if (list.isEmpty) return _snack('Nenhuma transcrição pronta.');
+    if (list.isEmpty) return _snack(l.noTranscriptReady);
     final text = list
         .map(
           (t) =>
@@ -127,11 +128,7 @@ class _JobScreenState extends State<JobScreen> {
         )
         .join('\n\n\n');
     await Clipboard.setData(ClipboardData(text: text));
-    _snack(
-      list.length == 1
-          ? '1 transcrição copiada.'
-          : '${list.length} transcrições copiadas.',
-    );
+    _snack(l.transcriptsCopied(list.length));
   }
 
   @override
@@ -164,18 +161,19 @@ class _JobScreenState extends State<JobScreen> {
 
         final text = Theme.of(context).textTheme;
         final scheme = Theme.of(context).colorScheme;
+        final l = l10nOf(context);
         return CrystalPage(
           child: Scaffold(
             appBar: AppBar(
-              title: const Text('Busca'),
+              title: Text(l.jobTitle),
               actions: [
                 IconButton(
-                  tooltip: 'Copiar tudo',
+                  tooltip: l.copyAll,
                   icon: const Icon(Icons.copy_all),
                   onPressed: job.okCount == 0 ? null : _copyAll,
                 ),
                 IconButton(
-                  tooltip: 'Compartilhar ZIP',
+                  tooltip: l.shareZip,
                   icon: const Icon(Icons.share),
                   onPressed: job.okCount == 0 || _busy
                       ? null
@@ -198,7 +196,7 @@ class _JobScreenState extends State<JobScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job.label,
+                          l.jobLabel(job),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: text.titleMedium,
@@ -206,7 +204,7 @@ class _JobScreenState extends State<JobScreen> {
                         const SizedBox(height: 6),
                         // Counts change in place, rising softly.
                         TextSwap(
-                          '${jobStatusText(job, running: running)} · ${job.settings.format.label} · ${languageName(job.settings.language)}',
+                          '${l.jobStatus(job, running: running)} · ${job.settings.format.label} · ${l.language(job.settings.language)}',
                           style: text.bodySmall,
                         ),
                         // Collapses away when the job finishes; the status line
@@ -226,7 +224,7 @@ class _JobScreenState extends State<JobScreen> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              m,
+                              l.notice(m),
                               style: text.bodySmall?.copyWith(
                                 color: scheme.error,
                               ),
@@ -258,7 +256,7 @@ class _JobScreenState extends State<JobScreen> {
                                         key: ValueKey('zip'),
                                       ),
                               ),
-                              label: const Text('Baixar ZIP'),
+                              label: Text(l.downloadZip),
                             ),
                             // Pause and Continue swap in the same slot.
                             if (running ||
@@ -270,22 +268,20 @@ class _JobScreenState extends State<JobScreen> {
                                         key: const ValueKey('pause'),
                                         onPressed: () => app.pause(job),
                                         icon: const Icon(Icons.pause),
-                                        label: const Text('Pausar'),
+                                        label: Text(l.pause),
                                       )
                                     : job.state != JobState.done
                                     ? OutlinedButton.icon(
                                         key: const ValueKey('resume'),
                                         onPressed: () => app.resume(job),
                                         icon: const Icon(Icons.play_arrow),
-                                        label: const Text('Continuar'),
+                                        label: Text(l.resume),
                                       )
                                     : OutlinedButton.icon(
                                         key: const ValueKey('retry'),
                                         onPressed: () => app.resume(job),
                                         icon: const Icon(Icons.refresh),
-                                        label: const Text(
-                                          'Tentar as falhas de novo',
-                                        ),
+                                        label: Text(l.retryFailed),
                                       ),
                               ),
                           ],
@@ -297,10 +293,10 @@ class _JobScreenState extends State<JobScreen> {
                   if (total >= 10) ...[
                     const SizedBox(height: 14),
                     TextField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Filtrar por título',
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: l.filterByTitle,
                       ),
                       onChanged: (v) => setState(() => _query = v),
                     ),
@@ -310,9 +306,9 @@ class _JobScreenState extends State<JobScreen> {
                     // Pill slides to the chosen filter.
                     SlidingTabs<_Filter>(
                       options: [
-                        (_Filter.all, 'Todos ($total)'),
-                        (_Filter.ok, 'Prontos (${job.okCount})'),
-                        (_Filter.failed, 'Falhas (${job.failedCount})'),
+                        (_Filter.all, l.filterAll(total)),
+                        (_Filter.ok, l.filterReady(job.okCount)),
+                        (_Filter.failed, l.filterFailed(job.failedCount)),
                       ],
                       value: _filter,
                       onChanged: (f) => setState(() => _filter = f),
@@ -384,6 +380,7 @@ class _ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = l10nOf(context);
     final (icon, color) = switch (item.status) {
       // Brand status colors: green ready, amber when a fallback track was used.
       ItemStatus.ok => (
@@ -395,11 +392,11 @@ class _ItemTile extends StatelessWidget {
     };
     final sub = switch (item.status) {
       ItemStatus.ok => [
-        if (item.fromCache) 'cache',
-        if (item.note != null) item.note!,
+        if (item.fromCache) l.fromCache,
+        if (item.note != null) l.notice(item.note!),
       ].join(' · '),
-      ItemStatus.failed => (item.reason ?? FailureReason.unknown).message,
-      ItemStatus.pending => 'Na fila',
+      ItemStatus.failed => l.failure(item.reason ?? FailureReason.unknown),
+      ItemStatus.pending => l.inQueue,
     };
     return ListTile(
       // A video turning from "in queue" to ready/failed is the moment worth showing.
@@ -424,11 +421,7 @@ class _ItemTile extends StatelessWidget {
                 // Cache was cleared: fetch this video again.
                 app.refetch(job, item);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'A transcrição saiu do cache. Buscando de novo…',
-                    ),
-                  ),
+                  SnackBar(content: Text(l.leftCache)),
                 );
                 return;
               }
